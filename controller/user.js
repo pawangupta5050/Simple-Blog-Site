@@ -14,13 +14,23 @@ const handleSignupUser = async (req, res) => {
 
 const handleSigninUser = async (req, res) => {
     const {email, password} = req.body;
-    const user = await User.matchPassword(email, password);
+    try {
+        const token = await User.matchPasswordAndGenerateToken(email, password);
+        return res.cookie("token", token).redirect('/')
+    } catch (error) {
+        return res.render('signin', {
+            error: "Incorrect Email or Password",
+        });
+    }
+    
+}
 
-    console.log('user', user)
-    return res.redirect('/')
+const handleLogoutUser = (req, res) => {
+    return res.clearCookie('token').redirect('/');
 }
 
 module.exports = {
     handleSignupUser,
     handleSigninUser,
+    handleLogoutUser,
 }

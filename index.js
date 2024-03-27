@@ -1,7 +1,14 @@
 const express = require('express');
 const path = require('path');
+const dotenv = require('dotenv');
+const multer = require('multer');
+const cookieParser = require('cookie-parser');
+dotenv.config();
 const dbConnection = require('./connection.js');
-const userRouter = require('./routes/user.js')
+const userRouter = require('./routes/user.js');
+const blogRouter = require('./routes/blog.js');
+const { checkAuthenticationCookie } = require('./middleware/auth.js');
+const Blog = require('./model/blog.js');
 const app = express();
 const PORT = 8000;
 
@@ -12,12 +19,32 @@ app.set('views', path.resolve('./view'))
 
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
+app.use(cookieParser())
+app.use(express.static(path.resolve('./public')))
+app.use(checkAuthenticationCookie('token'))
 
-app.get('/', (req, res) => {
-    return res.render('home');
+const storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, path.resolve(`./public/uploads`))
+    },
+    filename: function(req, file, cb) {
+        cb(null, `${Date.now()}-${file.originalname}`)
+    }
+})
+
+const upload = multer({storage: storage})
+
+app.get('/', async (req, res) => {
+    const allBlogs = await Blog.find({});
+    return res.render('home', {
+        user: req.user,
+        blogs: allBlogs,
+    });
 })
 
 app.use('/user', userRouter)
+
+app.use('/blog', upload.single('coverImage'), blogRouter)
 
 
 app.listen(PORT, () => console.log('listening on port ' + PORT));
