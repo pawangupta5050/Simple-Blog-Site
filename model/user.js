@@ -1,4 +1,4 @@
-const { creatrHmac, randomBytes, createHmac } = require('node:crypto')
+const { randomBytes, createHmac } = require('node:crypto')
 const mongoose = require('mongoose');
 const { createUserToken } = require('../service/auth');
 
