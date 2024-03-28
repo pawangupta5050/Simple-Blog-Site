@@ -3,20 +3,62 @@
 
 <head>
     <%- include('./partials/head') %>
-    <title><%= blog.title %></title>
+        <title>
+            <%= blog.title %>
+        </title>
 </head>
 
 <body>
     <%- include('./partials/nav') %>
-    <div class="container mt-4">
-        <img src="<%= blog.coverImageURL %>" class="img-fluid" alt="...">
-        <div class="mt-4">
-            <h5 class="text-center"><%= blog.title %></h5>
-            <p class="text-center mt-4"><%= blog.body %></p>
-          </div>
-        
-    </div>
-        <%- include('./partials/scripts') %>
+        <div class="container mt-4">
+            <img src="<%= blog.coverImageURL %>" class="img-fluid" alt="..." style="height: 70vh; width: 100%;">
+            <div class="mt-4">
+                <h5 class="text-center">
+                    <%= blog.title %>
+                </h5>
+                <pre class="text-break mt-4"><%= blog.body %></pre>
+            </div>
+        </div>
+        <div class="container mt-4 mb-4">
+            <img src="<%= blog.createdBy.profileImageURL %>" class="me-2" width="50px">
+            <%= blog.createdBy.fullName %>
+        </div>
+        <div class="container mt-3 mb-4">
+            <h4>Comments (<%= comments.length %>)</h4>
+
+            <% if(locals.user) { %>
+                <form method="POST" action="/comment/<%= blog._id %>">
+                    <div class="mb-3">
+
+                        <input type="text" class="form-control" id="content" aria-describedby="comment" name="content">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+                <% } %>
+
+        </div>
+
+        <% if(locals.comments) { %>
+            <% comments.forEach(comment=> { %>
+                <div class="container mt-4">
+
+                    <div class="d-flex flex-row">
+                        <div class="">
+                            <img src="<%= blog.createdBy.profileImageURL %>" class="me-2" width="50px">
+                        </div>
+                        <div class="">
+                            <p class="text-bold mb-1">
+                                <%= comment.createdBy.fullName %>
+                            </p>
+                            <pre class="text-break"><%= comment.content %></pre>
+                        </div>
+                        
+                    </div>
+                </div>
+                <% }) %>
+                    <% } %>
+
+                        <%- include('./partials/scripts') %>
 </body>
 
 </html>

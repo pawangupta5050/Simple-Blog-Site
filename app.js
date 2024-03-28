@@ -1,16 +1,17 @@
+const dotenv = require('dotenv');
+dotenv.config();
 const express = require('express');
 const path = require('path');
-const dotenv = require('dotenv');
 const multer = require('multer');
 const cookieParser = require('cookie-parser');
-dotenv.config();
 const dbConnection = require('./connection.js');
 const userRouter = require('./routes/user.js');
 const blogRouter = require('./routes/blog.js');
+const commentRouter = require('./routes/comment.js');
 const { checkAuthenticationCookie } = require('./middleware/auth.js');
 const Blog = require('./model/blog.js');
 const app = express();
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
 dbConnection().then(() => console.log('connection established')).catch((error) => console.log(error))
 
@@ -45,6 +46,8 @@ app.get('/', async (req, res) => {
 app.use('/user', userRouter)
 
 app.use('/blog', upload.single('coverImage'), blogRouter)
+
+app.use('/comment', commentRouter)
 
 
 app.listen(PORT, () => console.log('listening on port ' + PORT));

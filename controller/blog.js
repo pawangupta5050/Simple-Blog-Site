@@ -1,14 +1,17 @@
-const Blog = require('../model/blog')
+const Blog = require('../model/blog');
+const Comment = require('../model/comment');
 
 const handleGetBlogById = async (req, res) => {
     const blogId = req.params.id;
-    const blog = await Blog.findOne({ _id: blogId });
+    const blog = await Blog.findById(blogId).populate("createdBy");
+    const comments = await Comment.find({blogId}).populate("createdBy");
     return res.render('blog', {
         user: req.user,
         blog: blog,
+        comments: comments,
     })
 }
-
+ 
 const handleBlogCreate = async (req, res) => {
     const {title, body, coverImageURL} = req.body;
 
